@@ -132,43 +132,52 @@
         
         return $root[0];
     }
+    
+    var tumblr = {
+    
+        run: function () {
+            var $container = $('#container');
 
-    $(function() {
-        var $container = $('#container');
+            $container.isotope({
+                itemSelector : '.post',
+                masonry: {
+                    columnWidth: 120
+                }
+            });
+            
+            $('#filters').on('click', 'a', function () {
+                var selector = $(this).attr('data-filter');
+                
+                $container.isotope({ filter: selector });
+                
+                $filters.find('.selected').removeClass('selected');
+                $(this).addClass('selected');
+                
+                return false;
+            });
+            
+            $('#load-more').on('click', function () {
+                _offset += 10;
 
-        $container.isotope({
-            itemSelector : '.post',
-            masonry: {
-                columnWidth: 120
-            }
-        });
-        
-        $('#filters').on('click', 'a', function () {
-            var selector = $(this).attr('data-filter');
+                _loadPosts(_offset, _count, function (newElements) {
+                    $container.isotope( 'insert', $(newElements) ); 
+                });
+                
+                return false;
+            });
             
-            $container.isotope({ filter: selector });
-            
-            $filters.find('.selected').removeClass('selected');
-            $(this).addClass('selected');
-            
-            return false;
-        });
-        
-        $('#load-more').on('click', function () {
-            _offset += 10;
-
             _loadPosts(_offset, _count, function (newElements) {
                 $container.isotope( 'insert', $(newElements) ); 
             });
-            
-            return false;
-        });
+        }
         
-        _loadPosts(_offset, _count, function (newElements) {
-            $container.isotope( 'insert', $(newElements) ); 
-        });
-        
-        
-    });
+    };
+    
+    if (!window.beckysbrain) {
+        window.beckysbrain = {};
+    }
+    window.beckysbrain.tumblr = tumblr;
+    
+    tumblr.run();
 
 }(jQuery, window, window.document, window.beckysbrain.utils));
