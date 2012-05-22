@@ -2,6 +2,8 @@
 
     var _baseTumblrPostsApiUrl = 'http://api.tumblr.com/v2/blog/beckysbrain.tumblr.com/posts',
         _tumblrApiKey = '?api_key=X9UXZNouFnf2rJSR0hpKlUed3E5ssvnVTylwhOOrEUOEbgGVcN',
+        _offset = 0,
+        _count = 10,
         _tagCache = [],
         $filters = $('#filters');
 
@@ -32,7 +34,11 @@
             jqxhr = $.ajax({
                 url: _baseTumblrPostsApiUrl + _tumblrApiKey,
                 dataType: 'jsonp',
-                jsonp: 'jsonp'
+                jsonp: 'jsonp',
+                data: {
+                    offset: start,
+                    limit: count
+                }
             });
         
         jqxhr.done(function (data) {
@@ -148,9 +154,21 @@
             return false;
         });
         
-        _loadPosts(0, 10, function (newElements) {
+        $('#load-more').on('click', function () {
+            _offset += 10;
+
+            _loadPosts(_offset, _count, function (newElements) {
+                $container.isotope( 'insert', $(newElements) ); 
+            });
+            
+            return false;
+        });
+        
+        _loadPosts(_offset, _count, function (newElements) {
             $container.isotope( 'insert', $(newElements) ); 
         });
+        
+        
     });
 
 }(jQuery, window, window.document, window.beckysbrain.utils));
