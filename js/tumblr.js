@@ -1,4 +1,4 @@
-(function ($) {
+(function ($, window, document, utils) {
 
     var _baseTumblrPostsApiUrl = 'http://api.tumblr.com/v2/blog/beckysbrain.tumblr.com/posts',
         _tumblrApiKey = '?api_key=X9UXZNouFnf2rJSR0hpKlUed3E5ssvnVTylwhOOrEUOEbgGVcN',
@@ -19,6 +19,7 @@
             $filterLink = $('<a />');
             
         $filterLink.attr('data-filter', '.' + normalizedTagName);
+        $filterLink.attr('href', '#' + normalizedTagName);
         $filterLink.text(tagName);
         
         $filterItem.append($filterLink);
@@ -74,9 +75,11 @@
         var $root = $('<div />'),
             $title = $('<div class="title" />'),
             $body = $('<div class="body" />'),
-            $date = $('<div class="date" />');
+            $date = $('<div class="date" />'),
+            colorString = utils.generateRandomColor();
         
         $root.addClass('post');
+        $root.css('background-color', colorString);
         $root.attr('data-date', postData.date);
         $root.attr('data-timestamp', postData.timestamp);
         $root.attr('data-id', postData.id);
@@ -150,4 +153,4 @@
         });
     });
 
-}(jQuery));
+}(jQuery, window, window.document, window.beckysbrain.utils));
