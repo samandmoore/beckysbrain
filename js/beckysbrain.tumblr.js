@@ -1,7 +1,7 @@
 (function ($, window, document, utils) {
 
     var _baseTumblrPostsApiUrl = 'http://api.tumblr.com/v2/blog/beckysbrain.tumblr.com/posts',
-        _tumblrApiKey = '?api_key=X9UXZNouFnf2rJSR0hpKlUed3E5ssvnVTylwhOOrEUOEbgGVcN',
+        _tumblrApiKey = 'X9UXZNouFnf2rJSR0hpKlUed3E5ssvnVTylwhOOrEUOEbgGVcN',
         _offset = 0,
         _count = 10,
         _titleLength = 25,
@@ -44,10 +44,11 @@
     function _loadPosts(start, count, callback) {
         var posts = [],
             jqxhr = $.ajax({
-                url: _baseTumblrPostsApiUrl + _tumblrApiKey,
+                url: _baseTumblrPostsApiUrl,
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
                 data: {
+                    api_key: _tumblrApiKey,
                     offset: start,
                     limit: count
                 }
