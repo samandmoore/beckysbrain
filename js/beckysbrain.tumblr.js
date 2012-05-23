@@ -6,6 +6,7 @@
         _count = 10,
         _titleLength = 25,
         _appendText = '...',
+        _postTypeCache = [],
         _tagCache = [],
         $tagFilters = $('#tag-filters'),
         $typeFilters = $('#type-filters');
@@ -13,7 +14,25 @@
     function _normalizeTagName(tagName) {
         return tagName.replace(/[^aA-zZ0-9]/gi, '');
     }
+    
+    function _addPostType(postType) {
+        _postTypeCache.push(postType);
+        _addPostTypeFilter(postType);
+    }
+    
+    function _addPostTypeFilter(postType) {
+        var $filterItem = $('<li />'),
+            $filterLink = $('<a />');
+            
+        $filterLink.attr('data-filter', '*[data-post-type=' + postType + ']');
+        $filterLink.attr('href', '#' + postType);
+        $filterLink.text(postType);
         
+        $filterItem.append($filterLink);
+        
+        $typeFilters.append($filterItem);
+    }
+    
     function _addTag(tagName, normalizedTagName) {
         _tagCache.push(normalizedTagName);
         _addTagFilter(tagName, normalizedTagName);
@@ -26,19 +45,6 @@
         $filterItem.text(tagName);
         
         $tagFilters.append($filterItem);
-    }
-    
-    function _addFilter(tagName, normalizedTagName) {
-        var $filterItem = $('<li />'),
-            $filterLink = $('<a />');
-            
-        $filterLink.attr('data-filter', '.' + normalizedTagName);
-        $filterLink.attr('href', '#' + normalizedTagName);
-        $filterLink.text(tagName);
-        
-        $filterItem.append($filterLink);
-        
-        $filters.append($filterItem);
     }
         
     function _loadPosts(start, count, callback) {
@@ -109,6 +115,10 @@
         $root.attr('data-id', postData.id);
         $root.attr('data-post-url', postData.post_url);
         $root.attr('data-post-type', postData.type);
+        
+        if ($.inArray(postData.type, _postTypeCache) === -1) {
+            _addPostType(postData.type);
+        }
         
         date = new Date(postData.date);
         $date.text(date.formatDate() + ' ' + date.formatTime(true));

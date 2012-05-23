@@ -63,16 +63,16 @@
           transition: none;
 }
 
-#filters {
+#type-filters {
     margin: 0;
     padding: 0;
 }
-    #filters li {
+    #type-filters li {
         list-style-type: none;
         display: inline-block;
     }
 
-#filters a {
+#type-filters a {
     display: inline-block;
     background: #f5f5f5;
     padding: 5px;
