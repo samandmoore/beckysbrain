@@ -81,5 +81,33 @@
 
 #content .post {
     display: block;
-    border: 1px solid #f5f5f5;
+    position: relative;
+    height: 120px;
+    width: 120px;
+    overflow: hidden;
+    margin: 5px;
+}
+
+#content .doublewide {
+    width: 240px;
+}
+
+#content .doubletall {
+    height: 240px;
+}
+
+#content .triplewide {
+    width: 360px;
+}
+
+#content .tripletall {
+    height: 360px;
+}
+
+#content .quadwide {
+    width: 480px;
+}
+
+#content .quadtall {
+    height: 480px;
 }

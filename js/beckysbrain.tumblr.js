@@ -4,8 +4,11 @@
         _tumblrApiKey = '?api_key=X9UXZNouFnf2rJSR0hpKlUed3E5ssvnVTylwhOOrEUOEbgGVcN',
         _offset = 0,
         _count = 10,
+        _titleLength = 25,
+        _appendText = '...',
         _tagCache = [],
-        $filters = $('#filters');
+        $tagFilters = $('#tag-filters'),
+        $typeFilters = $('#type-filters');
 
     function _normalizeTagName(tagName) {
         return tagName.replace(/[^aA-zZ0-9]/gi, '');
@@ -13,7 +16,16 @@
         
     function _addTag(tagName, normalizedTagName) {
         _tagCache.push(normalizedTagName);
-        _addFilter(tagName, normalizedTagName);
+        _addTagFilter(tagName, normalizedTagName);
+    }
+    
+    function _addTagFilter(tagName, normalizedTagName) {
+        var $filterItem = $('<option />');
+            
+        $filterItem.attr('data-filter', '.' + normalizedTagName);
+        $filterItem.text(tagName);
+        
+        $tagFilters.append($filterItem);
     }
     
     function _addFilter(tagName, normalizedTagName) {
@@ -70,6 +82,10 @@
                 post = _buildPhotoPost(postData);
                 break;
                 
+            case 'audio':
+                post = _buildAudioPost(postData);
+                break;
+                
             default:
                 post = _buildTextPost(postData);
         }
@@ -82,6 +98,7 @@
             $title = $('<div class="title" />'),
             $body = $('<div class="body" />'),
             $date = $('<div class="date" />'),
+            date = null,
             colorString = utils.generateRandomColor();
         
         $root.addClass('post');
@@ -90,8 +107,10 @@
         $root.attr('data-timestamp', postData.timestamp);
         $root.attr('data-id', postData.id);
         $root.attr('data-post-url', postData.post_url);
+        $root.attr('data-post-type', postData.type);
         
-        $date.text(postData.date);
+        date = new Date(postData.date);
+        $date.text(date.formatDate() + ' ' + date.formatTime(true));
         
         $root.append($title);
         $root.append($date);
@@ -115,9 +134,14 @@
     function _buildTextPost(postData) {
         var $root = _buildBasePost(postData),
             $title = $root.find('.title'),
-            $body = $root.find('.body');
+            $body = $root.find('.body'),
+            $link = $('<a />');
         
-        $title.html(postData.title);
+        $root.addClass('quadwide tripletall');
+        
+        $link.attr('href', postData.post_url);
+        $link.html(postData.title);
+        $title.append($link);
         $body.html(postData.body);
         
         return $root[0];
@@ -126,9 +150,49 @@
     function _buildPhotoPost(postData) {
         var $root = _buildBasePost(postData),
             $title = $root.find('.title'),
-            $body = $root.find('.body');
+            $body = $root.find('.body'),
+            $anchor = null,
+            $thumb = null,
+            titleText = utils.decodeHtml(postData.caption),
+            $link = $('<a />');
         
-        $body.html(postData.caption);
+        $root.addClass('doublewide doubletall');
+
+        $link.attr('href', postData.post_url);
+        $link.text(utils.truncateString(titleText, _titleLength));
+        $title.append($link);
+        
+        $.each(postData.photos, function (idx, el) {
+            $thumb = $('<img />');
+            $thumb.attr('src', el.alt_sizes[el.alt_sizes.length-1].url);
+            
+            $anchor = $('<a />');
+            $anchor.attr('href', el.original_size.url);
+            
+            $anchor.append($thumb);
+            $body.append($anchor);
+        });
+        
+        $body.append(postData.caption);
+        
+        return $root[0];
+    }
+    
+    function _buildAudioPost(postData) {
+        var $root = _buildBasePost(postData),
+            $title = $root.find('.title'),
+            $body = $root.find('.body'),
+            $link = $('<a />'),
+            titleText = utils.decodeHtml(postData.caption);
+        
+        $root.addClass('doublewide doubletall');
+        
+        $link.attr('href', postData.post_url);
+        $link.html(utils.truncateString(titleText, _titleLength));
+        $title.append($link);
+        
+        $body.append(postData.player);
+        $body.append(postData.caption);
         
         return $root[0];
     }
@@ -141,16 +205,22 @@
             $container.isotope({
                 itemSelector : '.post',
                 masonry: {
-                    columnWidth: 120
+                    columnWidth: 130
                 }
             });
             
-            $('#filters').on('click', 'a', function () {
+            $tagFilters.on('change', function () {
+                var selector = $(this).find(':selected').attr('data-filter');
+                
+                $container.isotope({ filter: selector });
+            });
+            
+            $typeFilters.on('click', 'a', function () {
                 var selector = $(this).attr('data-filter');
                 
                 $container.isotope({ filter: selector });
                 
-                $filters.find('.selected').removeClass('selected');
+                $typeFilters.find('.selected').removeClass('selected');
                 $(this).addClass('selected');
                 
                 return false;
